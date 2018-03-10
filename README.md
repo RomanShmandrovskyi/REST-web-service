@@ -21,3 +21,4 @@ Web Service has 3 GET requests, 3 POST requests and 1 DELETE request<br/>
 #### DELETE (only in Postman):
 1. http://localhost:8080/rest/service/wallet/{id}/delete - delete wallet with id = {id} (if wallet with such id not exist you will be informed)<br/>
 *Example: http://localhost:8080/rest/service/wallet/2/delete*
+# FOR CLIENT CORRECT WORKING DO NOT STOP WEB SERVICE
