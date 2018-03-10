@@ -9,7 +9,7 @@ Web Service has 3 GET requests, 3 POST requests and 1 DELETE request<br/>
 #### GET: (you can put this in your browser)
 1. http://localhost:8080/rest/service/wallet/all - to get all existing wallet (if there is no one wallet, you will be informed)<br/>
 2. http://localhost:8080/rest/service/wallet/{id}/balance - get balance of wallet with id = {id} (if wallet with such id not exist you will be informed)<br/>
-*Example: http://localhost:8080/rest/service/wallet/2/balanc*
+*Example: http://localhost:8080/rest/service/wallet/2/balance*
 3. http://localhost:8080/rest/service/wallet/{id} - get wallet with id = {id} (if wallet with such id not exist you will be informed)<br/>
 *Exampple: http://localhost:8080/rest/service/wallet/2*
 #### POST (only in Postman):
