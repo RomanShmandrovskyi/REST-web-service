@@ -5,6 +5,7 @@ import web.util.ResponseHandler;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/service/wallet")
 public class WalletServiceImpl implements WalletService {
@@ -14,8 +15,8 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Response getAllWallets() {
-        return ResponseHandler.getAllWallets();
+    public Response getAllWallets(UriInfo uriInfo) {
+        return ResponseHandler.getAllWallets(uriInfo);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package web;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 public interface WalletService {
 
@@ -14,20 +16,20 @@ public interface WalletService {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllWallets();
+    Response getAllWallets(@Context UriInfo ui);
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     Response getWalletById(@PathParam("id") int id);
 
-    @POST
+    @PUT
     @Path("/{id}/buy")
     @Produces(MediaType.APPLICATION_JSON)
     Response buyGood(@PathParam("id") int id,
                      @QueryParam("price") double price);
 
-    @POST
+    @PUT
     @Path("/{id}/putMoney")
     @Produces(MediaType.APPLICATION_JSON)
     Response putMoneyOnWallet(@PathParam("id") int id,

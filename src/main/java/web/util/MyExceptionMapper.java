@@ -15,11 +15,17 @@ public class MyExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception e) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         if (e instanceof WalletException) {
-            map.put("message", e.getMessage());
+            WalletException we = (WalletException) e;
+            int statusCode = we.getStatus().getStatusCode();
+
+            map.put("statusCode", we.getStatus().getStatusCode());
+            map.put("error", we.getStatus().getReasonPhrase());
+            map.put("reason", we.getMessage());
+            return Response.status(statusCode).entity(gson.toJson(map)).build();
         } else {
             map.put("message", e.getMessage());
         }

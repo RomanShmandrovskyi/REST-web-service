@@ -1,35 +1,61 @@
 package web.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.jayway.jsonpath.JsonPath;
 import dao.WalletDao;
 import exception.WalletException;
 import model.Wallet;
+import org.codehaus.jackson.map.ObjectWriter;
+import org.json.JSONArray;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ResponseHandler {
-    private static final String BUY_GOOD = "product was purchased successfully";
-    private static final String REFILL_BALANCE = "balance was refill successfully";
-    private static final String ADD_NEW_WALLET = "new wallet added successfully";
-    private static final String WALLET_DELETED = "wallet deleted successfully";
+    private static final String BUY_GOOD = "Product was purchased successfully";
+    private static final String REFILL_BALANCE = "Balance was refill successfully";
+    private static final String ADD_NEW_WALLET = "New wallet added successfully";
+    private static final String WALLET_DELETED = "Wallet deleted successfully";
 
-    private static final String MAX_LIMIT_EXCEEDED = "you have exceeded your maximum limit";
-    private static final String CREDIT_LIMIT_EXCEEDED = "you have exceeded your credit limit";
-    private static final String WALLET_NOT_FOUND = "there is no one wallet with such id";
-    private static final String NO_ONE_WALLET = "there is no one wallet! Try to add one!";
+    private static final String MAX_LIMIT_EXCEEDED = "You have exceeded your maximum limit";
+    private static final String CREDIT_LIMIT_EXCEEDED = "You have exceeded your credit limit";
+    private static final String WALLET_NOT_FOUND = "There is no one wallet with such id";
 
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder().create();
     private static WalletDao dao = new WalletDao();
 
-    public static Response getAllWallets() {
+    public static Response getAllWallets(UriInfo uriInfo) {
+        System.out.println(uriInfo.getPathParameters());
+        System.out.println(uriInfo.getQueryParameters());
+
         List<Wallet> wallets = dao.getAllWallets();
 
         if (wallets.size() == 0) {
-            throw new WalletException(NO_ONE_WALLET, Status.NO_CONTENT);
+            return Response.status(200)
+                    .entity(gson.toJson(new JsonArray()))
+                    .build();
+        }
+
+        if (uriInfo.getQueryParameters().size() == 0) {
+            return Response.status(200)
+                    .entity(gson.toJson(wallets))
+                    .build();
+        }
+
+        JSONArray walletsArr = new JSONArray(wallets);
+
+        for (String key : uriInfo.getQueryParameters().keySet()) {
+            if (!walletsArr.getJSONObject(0).has(key)) {
+                return Response.status(200)
+                        .entity(gson.toJson(new JsonArray()))
+                        .build();
+            }
         }
 
         return Response
@@ -42,7 +68,7 @@ public class ResponseHandler {
         double balance = dao.getBalance(id);
 
         if (balance == Double.MAX_VALUE) {
-            throw new WalletException(WALLET_NOT_FOUND, Status.NO_CONTENT);
+            throw new WalletException(WALLET_NOT_FOUND, Status.NOT_FOUND);
         }
 
         JsonObject res = new JsonObject();
@@ -58,7 +84,7 @@ public class ResponseHandler {
         Wallet wallet = dao.getWalletById(id);
 
         if (wallet == null) {
-            throw new WalletException(WALLET_NOT_FOUND, Status.NO_CONTENT);
+            throw new WalletException(WALLET_NOT_FOUND, Status.NOT_FOUND);
         }
 
         return Response
@@ -80,6 +106,7 @@ public class ResponseHandler {
             } else {
                 Wallet wallet = dao.getWalletById(id);
                 message.addProperty("message", BUY_GOOD);
+                message.addProperty("currentBalance", wallet.getBalance());
                 return Response
                         .status(200)
                         .entity(gson.toJson(wallet))
@@ -112,12 +139,13 @@ public class ResponseHandler {
     }
 
     public static Response addNewWallet() {
-        dao.addNewWallet();
-        JsonObject message = new JsonObject();
-        message.addProperty("message", ADD_NEW_WALLET);
+        Wallet wallet = dao.addNewWallet();
+        JsonObject response = new JsonObject();
+        response.addProperty("message", ADD_NEW_WALLET);
+        response.add("wallet", gson.toJsonTree(wallet));
         return Response
                 .status(200)
-                .entity(message.toString())
+                .entity(response.toString())
                 .build();
     }
 

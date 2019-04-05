@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class WalletDao {
+    private static int id;
     private static double oldBalance;
     private static List<Wallet> wallets;
 
@@ -88,10 +89,6 @@ public class WalletDao {
     }
 
     private int idGenerator() {
-        if (wallets.size() == 0) {
-            return 1;
-        } else {
-            return wallets.get(wallets.size() - 1).getWalletId() + 1;
-        }
+        return id++;
     }
 }
